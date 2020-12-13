@@ -14,7 +14,7 @@ function App() {
     setUser(currentUser);
   });
 
-  return <div className="App">{!user ? <Login /> : <Abonos />}</div>;
+  return <div className="App">{user ? <Login /> : <Abonos />}</div>;
 }
 
 export default App;
