@@ -13,6 +13,7 @@ import "./Abonos.css";
 import firebase from "../../utils/firebase";
 import "firebase/firestore";
 import "firebase/storage";
+import "firebase/auth";
 
 const db = firebase.firestore(firebase);
 
@@ -157,6 +158,13 @@ export default function Abonos(props) {
     }
   };
 
+  const cerrarSesion = () => {
+    setAlertMessage("Cerrando sesión...");
+    setAlertType("warning");
+    setOpenAlert(true);
+    firebase.auth().signOut();
+  };
+
   return (
     <div
       style={{ backgroundImage: "url(" + Fondo + ")" }}
@@ -167,12 +175,22 @@ export default function Abonos(props) {
         <Button
           variant="contained"
           color="primary"
-          className="button-agregar"
+          className="button"
           onClick={() => {
             handleModal("agregarCliente");
           }}
         >
           Agregar Cliente
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          className="button"
+          onClick={() => {
+            cerrarSesion();
+          }}
+        >
+          Cerrar sesión
         </Button>
       </div>
       <MaterialTable

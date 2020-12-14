@@ -69,7 +69,7 @@ export default function AbonarForm(props) {
 
   return (
     <form onChange={onChange}>
-      <p>
+      <p style={{ fontSize: 20 }}>
         Agregar {abonar ? "abono (+)" : "cargo (-)"} a: <b>{rowData.cliente}</b>
       </p>
       <div className="textfield-container">

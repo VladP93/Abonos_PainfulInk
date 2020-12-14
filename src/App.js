@@ -28,8 +28,12 @@ function App() {
 
   return (
     <div className="App">
-      {user ? (
-        <Login />
+      {!user ? (
+        <Login
+          setAlertMessage={setAlertMessage}
+          setAlertType={setAlertType}
+          setOpenAlert={setOpenAlert}
+        />
       ) : (
         <Abonos
           setAlertMessage={setAlertMessage}
