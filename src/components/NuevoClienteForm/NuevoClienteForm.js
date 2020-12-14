@@ -36,26 +36,39 @@ export default function NuevoClienteForm(props) {
         if (file) {
           var imageUrl = new Date().getTime() + "-" + formData.cliente;
           formData.imageUrl = imageUrl;
-          uploadImage(imageUrl).then(async () => {
-            await firebase
-              .storage()
-              .ref(`tattoos/${imageUrl}`)
-              .getDownloadURL()
-              .then((url) => {
-                formData.imageUrl = url;
-              });
-            db.collection("abonos")
-              .add(formData)
-              .then(() => {
-                setAlertType("success");
-                setAlertMessage(
-                  `Cliente ${formData.cliente} ha sido agregado con el monto de $${formData.monto}`
-                );
-                setOpenAlert(true);
-              });
-          });
+          formData.imageName = imageUrl;
+          uploadImage(imageUrl)
+            .then(async () => {
+              await firebase
+                .storage()
+                .ref(`tattoos/${imageUrl}`)
+                .getDownloadURL()
+                .then((url) => {
+                  formData.imageUrl = url;
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+              db.collection("abonos")
+                .add(formData)
+                .then(() => {
+                  setAlertType("success");
+                  setAlertMessage(
+                    `Cliente ${formData.cliente} ha sido agregado con el monto de $${formData.monto}`
+                  );
+                  setOpenAlert(true);
+                  setRefresh(true);
+                })
+                .catch((err) => {
+                  console.log(err);
+                });
+            })
+            .catch((err) => {
+              console.log(err);
+            });
         } else {
           formData.imageUrl = "NoImage.png";
+          formData.imageName = "NoImage.png";
           db.collection("abonos")
             .add(formData)
             .then(() => {
@@ -64,6 +77,10 @@ export default function NuevoClienteForm(props) {
                 `Cliente ${formData.cliente} ha sido agregado con el monto de $${formData.monto} sin tattoo elegido`
               );
               setOpenAlert(true);
+              setRefresh(true);
+            })
+            .catch((err) => {
+              console.log(err);
             });
         }
         setRefresh(true);
@@ -110,8 +127,10 @@ export default function NuevoClienteForm(props) {
         </div>
         <div className="dropzone-container">
           <DropzoneArea
+            acceptedFiles={["image/*"]}
+            dropzoneText={"Click o arrastre imagen"}
             onChange={(files) => setFile(files[0])}
-            showPreviews={false}
+            showAlerts={false}
           />
         </div>
         <div>
@@ -135,6 +154,7 @@ export default function NuevoClienteForm(props) {
       cliente: "",
       monto: 0.0,
       imageUrl: "",
+      imageName: "",
     };
   }
 }

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal } from "@material-ui/core";
 import MaterialTable from "material-table";
+
 import Form from "../../components/NuevoClienteForm";
+import AbonarForm from "../../components/AbonarForm";
+import EliminarForm from "../../components/EliminarRegistroForm";
+
 import Fondo from "../../assets/Logo.jpg";
 import NoImage from "../../assets/NoImage.png";
-
 import "./Abonos.css";
 
 import firebase from "../../utils/firebase";
@@ -31,6 +34,9 @@ export default function Abonos(props) {
           arrayAbonos.push(data);
         });
         setData(arrayAbonos);
+      })
+      .catch((err) => {
+        console.log(err);
       });
     setRefresh(false);
   }, [refresh]);
@@ -43,16 +49,22 @@ export default function Abonos(props) {
     {
       title: "Monto($)",
       field: "monto",
+      type: "currency",
+      align: "left",
     },
     {
       title: "Tattoo",
       field: "imageUrl",
       render: (rowData) => (
-        <img
-          src={rowData.imageUrl === "NoImage.png" ? NoImage : rowData.imageUrl}
-          alt="tattoo"
-          style={{ width: 50, height: 40 }}
-        />
+        <a href={rowData.imageUrl} target="_blank" rel="noopener noreferrer">
+          <img
+            src={
+              rowData.imageUrl === "NoImage.png" ? NoImage : rowData.imageUrl
+            }
+            alt="tattoo"
+            style={{ width: 50, height: 40 }}
+          />
+        </a>
       ),
     },
   ];
@@ -62,14 +74,21 @@ export default function Abonos(props) {
       icon: "add",
       tooltip: "Agregar abono",
       onClick: (event, rowData) => {
-        // Do save operation
+        handleModal("abonar", rowData);
+      },
+    },
+    {
+      icon: "remove",
+      tooltip: "Cargo",
+      onClick: (event, rowData) => {
+        handleModal("cargar", rowData);
       },
     },
     {
       icon: "delete",
       tooltip: "Eliminar registro",
       onClick: (event, rowData) => {
-        // Do save operation
+        handleModal("eliminar", rowData);
       },
     },
   ];
@@ -78,11 +97,52 @@ export default function Abonos(props) {
     setOpen(false);
   };
 
-  const handleModal = (modalName) => {
+  const handleModal = (modalName, rowData) => {
     switch (modalName) {
       case "agregarCliente":
         setModalChild(
           <Form
+            handleCloseModal={handleClose}
+            setAlertMessage={setAlertMessage}
+            setAlertType={setAlertType}
+            setOpenAlert={setOpenAlert}
+            setRefresh={setRefresh}
+          />
+        );
+        setOpen(true);
+        break;
+      case "abonar":
+        setModalChild(
+          <AbonarForm
+            rowData={rowData}
+            handleCloseModal={handleClose}
+            setAlertMessage={setAlertMessage}
+            setAlertType={setAlertType}
+            setOpenAlert={setOpenAlert}
+            setRefresh={setRefresh}
+            abonar={true}
+          />
+        );
+        setOpen(true);
+        break;
+      case "cargar":
+        setModalChild(
+          <AbonarForm
+            rowData={rowData}
+            handleCloseModal={handleClose}
+            setAlertMessage={setAlertMessage}
+            setAlertType={setAlertType}
+            setOpenAlert={setOpenAlert}
+            setRefresh={setRefresh}
+            abonar={false}
+          />
+        );
+        setOpen(true);
+        break;
+      case "eliminar":
+        setModalChild(
+          <EliminarForm
+            rowData={rowData}
             handleCloseModal={handleClose}
             setAlertMessage={setAlertMessage}
             setAlertType={setAlertType}
