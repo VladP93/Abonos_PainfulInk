@@ -1,13 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Modal } from "@material-ui/core";
 import MaterialTable from "material-table";
 import Form from "../../components/NuevoClienteForm";
-import Fondo from "../../assets/70654501_154886548921252_5749499049328011454_n.jpg";
+import Fondo from "../../assets/Logo.jpg";
+import NoImage from "../../assets/NoImage.png";
 
 import "./Abonos.css";
 
-export default function Abonos() {
-  const [open, setOpen] = React.useState(false);
+import firebase from "../../utils/firebase";
+import "firebase/firestore";
+import "firebase/storage";
+
+const db = firebase.firestore(firebase);
+
+export default function Abonos(props) {
+  const { setAlertMessage, setAlertType, setOpenAlert } = props;
+  const [open, setOpen] = useState(false);
+  const [data, setData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [modalChild, setModalChild] = useState(<h2>Ventana Modal</h2>);
+
+  useEffect(() => {
+    db.collection("abonos")
+      .get()
+      .then((res) => {
+        const arrayAbonos = [];
+        res.docs.forEach((abono) => {
+          const data = abono.data();
+          data.id = abono.id;
+          arrayAbonos.push(data);
+        });
+        setData(arrayAbonos);
+      });
+    setRefresh(false);
+  }, [refresh]);
 
   const columns = [
     {
@@ -22,43 +48,53 @@ export default function Abonos() {
       title: "Tattoo",
       field: "imageUrl",
       render: (rowData) => (
-        <img src={rowData.imageUrl} alt="tattoo" style={{ width: 100 }} />
+        <img
+          src={rowData.imageUrl === "NoImage.png" ? NoImage : rowData.imageUrl}
+          alt="tattoo"
+          style={{ width: 50, height: 40 }}
+        />
       ),
     },
   ];
 
   const actions = [
     {
-      icon: "create",
-      tooltip: "Save User",
+      icon: "add",
+      tooltip: "Agregar abono",
       onClick: (event, rowData) => {
         // Do save operation
       },
     },
     {
       icon: "delete",
-      tooltip: "Save User",
+      tooltip: "Eliminar registro",
       onClick: (event, rowData) => {
         // Do save operation
       },
     },
   ];
 
-  const data = [
-    {
-      cliente: "Gerardo Vladimir Paniagua Sandoval",
-      monto: "40",
-      imageUrl:
-        "https://www.vikingo.top/wp-content/uploads/2019/07/valknut-300x150.png",
-    },
-  ];
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
   const handleClose = () => {
     setOpen(false);
+  };
+
+  const handleModal = (modalName) => {
+    switch (modalName) {
+      case "agregarCliente":
+        setModalChild(
+          <Form
+            handleCloseModal={handleClose}
+            setAlertMessage={setAlertMessage}
+            setAlertType={setAlertType}
+            setOpenAlert={setOpenAlert}
+            setRefresh={setRefresh}
+          />
+        );
+        setOpen(true);
+        break;
+      default:
+        setModalChild(<h2>Ventana Modal</h2>);
+    }
   };
 
   return (
@@ -72,7 +108,9 @@ export default function Abonos() {
           variant="contained"
           color="primary"
           className="button-agregar"
-          onClick={handleOpen}
+          onClick={() => {
+            handleModal("agregarCliente");
+          }}
         >
           Agregar Cliente
         </Button>
@@ -93,7 +131,7 @@ export default function Abonos() {
         aria-describedby="simple-modal-description"
         style={{ width: 350 }}
       >
-        <Form />
+        <div className="container-modal">{modalChild}</div>
       </Modal>
     </div>
   );

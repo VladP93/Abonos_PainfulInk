@@ -1,6 +1,6 @@
 import React from "react";
 import { TextField, Card, CardContent, Grid, Button } from "@material-ui/core";
-import Fondo from "../../assets/70654501_154886548921252_5749499049328011454_n.jpg";
+import Fondo from "../../assets/Logo.jpg";
 
 import "./Login.css";
 
